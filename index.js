@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
-const { getMatchScore, getNextMatches, getBrazilianLeagueRanking, getLastMatches } = require('../services/footballService');
+const { getMatchScore, getNextMatches, getBrazilianLeagueRanking, getLastMatches } = require('./services/footballService');
 
 // Inicializa o cliente do Discord
 const client = new Client({
