@@ -1,28 +1,27 @@
 require('dotenv').config();
-const express = require('express');
 const { Client, GatewayIntentBits } = require('discord.js');
-const { getMatchScore, getNextMatches, getBrazilianLeagueRanking, getLastMatches } = require('./services/footballService');
+const { getMatchScore, getNextMatches, getBrazilianLeagueRanking, getLastMatches } = require('../services/footballService');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
+// Inicializa o cliente do Discord
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent // Necessário para ler o conteúdo das mensagens
   ]
 });
 
 // Token do bot
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
+// Evento "ready" do bot
 client.once('ready', () => {
   console.log(`Bot logado como ${client.user.tag}`);
 });
 
+// Evento para ouvir mensagens
 client.on('messageCreate', async (message) => {
-  console.log('Mensagem recebida:', message.content);
+  console.log('Mensagem recebida:', message.content); // Log para mensagens
 
   if (message.content === '!ping') {
     message.channel.send('Pong!');
@@ -68,12 +67,16 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+// Login no Discord
 client.login(DISCORD_TOKEN);
 
-app.get('/', (req, res) => {
-  res.send('Bot está rodando!');
-});
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+// Função serverless para a Vercel
+module.exports = async (req, res) => {
+  // Inicia o bot
+  if (!client.isReady()) {
+    client.login(DISCORD_TOKEN);
+  }
+  
+  // Retorna resposta HTTP para a Vercel
+  res.status(200).json({ message: 'Bot rodando no servidor Vercel' });
+};
