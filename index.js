@@ -1,29 +1,34 @@
 require('dotenv').config();
+const express = require('express');
 const { Client, GatewayIntentBits } = require('discord.js');
 const { getMatchScore, getNextMatches, getBrazilianLeagueRanking, getLastMatches } = require('./services/footballService');
 
-const client = new Client({
-    intents: [
-      GatewayIntentBits.Guilds,
-      GatewayIntentBits.GuildMessages,
-      GatewayIntentBits.MessageContent // Necessário para ler o conteúdo das mensagens
-    ]
-});  
+const app = express();
+const PORT = process.env.PORT || 3000;
 
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
+});
+
+// Token do bot
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
 client.once('ready', () => {
-  console.log(`Logado como ${client.user.tag}`);
+  console.log(`Bot logado como ${client.user.tag}`);
 });
 
 client.on('messageCreate', async (message) => {
-    console.log('Mensagem recebida:', message.content);  // Adiciona log para ver o conteúdo das mensagens
+  console.log('Mensagem recebida:', message.content);
 
-    if (message.content === '!ping') {
-      message.channel.send('Pong!');
-    }
+  if (message.content === '!ping') {
+    message.channel.send('Pong!');
+  }
 
-    if (message.content === '!placar ao vivo') {
+  if (message.content === '!placar ao vivo') {
     const placar = await getMatchScore();
     message.channel.send(placar);
   }
@@ -64,3 +69,11 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(DISCORD_TOKEN);
+
+app.get('/', (req, res) => {
+  res.send('Bot está rodando!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
